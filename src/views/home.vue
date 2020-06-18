@@ -49,7 +49,6 @@ export default {
   display: flex;
   flex-direction: column;
 }
-
 #home .container main {
   max-width: 560px;
   flex: 1;
@@ -57,18 +56,22 @@ export default {
   flex-direction: column;
   justify-content: center;
 }
-
 #home .container main h1 {
   font-family: "Ubuntu", sans-serif;
   font-size: 54px;
   margin-top: 0;
 }
-
 #home main strong {
   font-size: 24px;
   font-weight: normal;
   line-height: 38px;
   margin: 25px auto;
+}
+
+@media (min-width: 1700px) {
+  #home {
+    background-position-x: 45vw;
+  }
 }
 
 @media (max-width: 900px) {
@@ -90,16 +93,13 @@ export default {
   }
 }
 
-@media (min-width: 1700px) {
-  #home {
-    background-position-x: 45vw;
-  }
-}
 
 @media (max-height: 760px) {
   #home {
     background-position-y: 100px;
   }
 }
+
+
 </style>
 

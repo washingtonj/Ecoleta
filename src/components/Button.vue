@@ -1,5 +1,5 @@
 <template>
-  <div class="buttom" :class="bsize">
+  <div class="button" :class="bsize">
     <div v-if="btype === 'icon'">
       <SearchIcon />
     </div>
@@ -20,7 +20,7 @@ export default {
 </script>
 
 <style>
-.buttom {
+.button {
   width: 100%;
   max-width: 360px;
   height: 72px;
@@ -37,12 +37,12 @@ export default {
   height: 50px;
 }
 
-.buttom:hover {
+.button:hover {
   background-color: #2fb86e;
   cursor: pointer;
 }
 
-.buttom div {
+.button div {
   display: flex;
   place-items: center;
   justify-content: center;
@@ -53,7 +53,7 @@ export default {
   background-color: #2FB86E;
 }
 
-.buttom p {
+.button p {
   justify-content: center;
   display: flex;
   flex-direction: row;

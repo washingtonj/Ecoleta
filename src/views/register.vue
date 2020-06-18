@@ -67,7 +67,7 @@
             </li>
           </div>
         </div>
-        <Button btext="Enviar minhas informações" />
+        <Button btext="Enviar minhas informações" bsize="md" />
       </div>
     </main>
   </div>
@@ -228,7 +228,7 @@ export default {
   pointer-events: none;
 }
 
-#register .buttom {
+#register .button {
   margin: auto;
 }
 
