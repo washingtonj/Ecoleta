@@ -1,5 +1,5 @@
 <template>
-  <div class="button" :class="bsize">
+  <div class="button" :class="bsize" @click="$emit('click', $event)">
     <div v-if="btype === 'icon'">
       <SearchIcon />
     </div>

@@ -1,121 +1,158 @@
 <template>
-  <div id="register">
-    <Header btext="Voltar para home" feather="arrowleft" to="/" />
-    <main>
-      <div class="container">
-        <div class="label">
-          <h1>Cadastro do ponto de coleta</h1>
-          <h3>Dados da entidade</h3>
-        </div>
-        <div class="data">
-          <form>
-            <div class="field">
-              <label for="name">Nome da entidade</label>
-              <input type="text" name="name" />
-            </div>
-            <div class="field-group">
-              <div class="field">
-                <label for="cep">CEP</label>
-                <input v-model="CEP" @blur="getCEP" type="text" name="cep" />
-              </div>
-              <div class="field">
-                <label for="city">Cidade</label>
-                <input :value="InfoCEP.localidade" type="text" name="city" readonly="{true}" />
-              </div>
-            </div>
-            <div class="field-group">
-              <div class="field">
-                <label for="address">Endereço</label>
-                <input :value="InfoCEP.logradouro" type="text" name="address" readonly="{true}" />
-              </div>
-              <div class="field">
-                <label for="number">Numero</label>
-                <input type="text" name="number" />
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="label type-description-flex">
-          <h1>Ítens de coleta</h1>
-          <p>Selecione um ou mais ítens abaixo.</p>
-        </div>
-        <div class="data">
-          <div class="items-grid">
-            <li class @click="selected" data-id="lamps">
-              <img src="../assets/lampadas.png" alt="Lampada" />
-              <span>Lâmpadas</span>
-            </li>
-            <li class @click="selected" data-id="baterrys">
-              <img src="../assets/baterias.png" alt="Pilhas e Baterias" />
-              <span>Pilhas e Baterias</span>
-            </li>
-            <li class @click="selected" data-id="papers">
-              <img src="../assets/papeis-papelao.png" alt="Papéis e Papelão" />
-              <span>Papéis e Papelão</span>
-            </li>
-            <li class @click="selected" data-id="eletronics">
-              <img src="../assets/eletronicos.png" alt="Resíduos Eletrônicos" />
-              <span>Resíduos Eletrônicos</span>
-            </li>
-            <li class @click="selected" data-id="organics">
-              <img src="../assets/organicos.png" alt="Resíduos Orgânicos" />
-              <span>Resíduos Orgânicos</span>
-            </li>
-            <li class @click="selected" data-id="oil">
-              <img src="../assets/oleo.png" alt="Óleo de Cozinha" />
-              <span>Óleo de Cozinha</span>
-            </li>
+  <div>
+    <div id="register">
+      <Header btext="Voltar para home" feather="arrowleft" to="/" />
+      <main>
+        <div class="container">
+          <div class="label">
+            <h1>Cadastro do ponto de coleta</h1>
+            <h3>Dados da entidade</h3>
           </div>
+          <div class="data">
+            <form>
+              <FormInput label="Nome da Entidade" @change="data.point = $event.target.value" />
+              <div class="field-group">
+                <FormInput label="CEP" @change="getCEP" />
+                <FormInput label="Numero" @change="data.number = $event.target.value" />
+              </div>
+              <div class="field-group">
+                <FormInput label="Logradouro" :value="data.address " />
+                <FormInput label="Cidade" :value="addrConcat" />
+              </div>
+            </form>
+          </div>
+          <div class="label type-description-flex">
+            <h1>Ítens de coleta</h1>
+            <p>Selecione um ou mais ítens abaixo.</p>
+          </div>
+          <div class="data">
+            <div class="items-grid">
+              <ListItems
+                v-for="item in items"
+                :key="item.id"
+                :label="item.label"
+                :icon="item.icon"
+                @click="selectedItem"
+              />
+            </div>
+          </div>
+          <Button btext="Enviar minhas informações" bsize="md" @click="postData()" />
         </div>
-        <Button btext="Enviar minhas informações" bsize="md" />
+      </main>
+    </div>
+
+    <Modal :show="modalShow">
+      <div class="modal-body">
+        <img src="@/assets/check.png" alt="Succes" />
+        <h1>Enviado com sucesso!</h1>
       </div>
-    </main>
+    </Modal>
   </div>
 </template>
 
 <script>
-import Header from "../components/Header";
-import Button from "../components/Button";
-
-import ViaCEP from "../services/api";
+import Header from "@/components/Header";
+import Button from "@/components/Button";
+import ListItems from "@/components/ListItems";
+import FormInput from "@/components/FormInput";
+import Modal from "@/components/Modal";
+import { api, viacep } from "@/services/api";
 
 export default {
   name: "Register",
+
   data: function() {
     return {
-      selectedItem: [],
-      CEP: "",
-      InfoCEP: {}
+      items: [
+        { label: "Lâmpadas", icon: "lampadas", id: "lamp" },
+        { label: "Pilhas e Baterias", icon: "baterias", id: "battery" },
+        { label: "Papéis e Papelão", icon: "papeis-papelao", id: "papers" },
+        {
+          label: "Resíduos Eletrônicos",
+          icon: "eletronicos",
+          id: "eletronics"
+        },
+        { label: "Resíduos Orgânicos", icon: "organicos", id: "organics" },
+        { label: "Óleo de Cozinha", icon: "oleo", id: "oil" }
+      ],
+
+      data: {
+        point: "",
+        image:
+          "https://images.unsplash.com/photo-1528323273322-d81458248d40?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2001&q=80",
+        wastype: [],
+        address: "",
+        state: "",
+        city: "",
+        number: ""
+      },
+      InfoCEP: {},
+      selectedItems: [],
+      modalShow: false
     };
   },
+
   components: {
     Header,
-    Button
+    Button,
+    ListItems,
+    FormInput,
+    Modal
   },
+
+  computed: {
+    addrConcat() {
+      if (!!this.data.city && !!this.data.state) {
+        return `${this.data.city} - ${this.data.state}`;
+      }
+      return "";
+    }
+  },
+
   methods: {
-    selected(e) {
-      e.target.classList.toggle("selected");
-
-      const dataID = e.target.getAttribute("data-id");
-      const index = this.selectedItem.indexOf(dataID);
-
-      index === -1
-        ? this.selectedItem.push(dataID)
-        : this.selectedItem.splice(index, 1);
+    async getCEP(event) {
+      const cep = event.target.value;
+      if (cep.length == 8) {
+        await viacep.get(`${cep}/json/`).then(element => {
+          this.data = {
+            ...this.data,
+            address: element.data.logradouro,
+            state: element.data.uf,
+            city: element.data.localidade
+          };
+        });
+      }
     },
 
-    async getCEP() {
-      if (this.CEP.length == 8) {
-        this.InfoCEP = await ViaCEP.get(`${this.CEP}/json/`).then(
-          element => element.data
-        );
+    selectedItem(event) {
+      const index = this.data.wastype.indexOf(event);
+      index === -1
+        ? this.data.wastype.push(event)
+        : this.data.wastype.splice(index, 1);
+    },
+
+    async postData() {
+      const inputsVerify = Object.values(this.data).filter(e => e.length <= 0);
+      if (inputsVerify.length <= 0) {
+        const data = {
+          ...this.data,
+          wastype: this.data.wastype.splice(",").join(", "),
+          address: `${this.data.address}, ${this.data.number}`
+        };
+
+        await api.post("/points/create", data).then(() => {
+          this.modalShow = true
+          setTimeout(() => history.back(), 5000) 
+        });
+      } else {
+        alert("Preencha todos os campos");
       }
     }
   }
 };
 </script>
 
-<style>
+<style scoped>
 #register {
   width: 90%;
   max-width: 1100px;
@@ -126,7 +163,6 @@ export default {
 }
 
 #register .container {
-  width: 75%;
   max-width: 900px;
   background-color: white;
   margin: 60px auto;
@@ -157,36 +193,13 @@ export default {
   margin: 15px auto;
 }
 
-#register .field {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
 #register .field-group {
   display: flex;
   flex-direction: row;
 }
 
 #register .field-group .field + .field {
-  margin-left: 10px;
-}
-
-#register label {
-  font-weight: normal;
-  font-size: 14px;
-  line-height: 16px;
-  color: #6c6c80;
-  margin-bottom: 5px;
-}
-
-#register input {
-  height: 56px;
-  background-color: #f0f0f5;
-  border: 0;
-  padding: 0 15px;
-  box-sizing: border-box;
-  margin-bottom: 10px;
+  margin-left: 8px;
 }
 
 #register .items-grid {
@@ -195,41 +208,15 @@ export default {
   gap: 16px;
 }
 
-#register .items-grid li {
-  background-color: #f5f5f5;
-  list-style: none;
-  border: 2px solid #f5f5f5;
-  border-radius: 8px;
-  height: 180px;
-  padding: 32px 24px 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  text-align: center;
-  cursor: pointer;
-}
-
-#register .items-grid li span {
-  margin-top: 12px;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  color: var(--title-color);
-}
-
-#register .items-grid li.selected {
-  background: #e1faec;
-  border: 2px solid #34cb79;
-}
-
-#register .items-grid li img,
-#register .items-grid li span {
-  pointer-events: none;
-}
-
 #register .button {
   margin: auto;
 }
 
+.modal-body img {
+  width: 100px;
+  align-self: center;
+}
+.modal-body h1 {
+  color: var(--primary-color);
+}
 </style>

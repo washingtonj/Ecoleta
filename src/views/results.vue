@@ -7,13 +7,13 @@
       </h4>
       <div class="cards">
         <div v-for="(point, index) in points" :key="index" class="card">
-          <img :src="point.picURL" :alt="point.pointName" />
-          <h1>{{point.pointName}}</h1>
+          <img :src="point.image" :alt="point.point" />
+          <h1>{{point.point}}</h1>
           <h3>{{point.wastype}}</h3>
           <p>
             {{point.address}}
             <br />
-            {{point.cad}}
+            {{point.city}} - {{point.state}}
           </p>
         </div>
       </div>
@@ -23,30 +23,24 @@
 
 <script>
 import Header from "@/components/Header";
+import { api } from "../services/api"
 
 export default {
   name: "Results",
   data() {
     return {
-      points: [
-        {
-          pointName: "Colecteria",
-          picURL:
-            "https://images.unsplash.com/photo-1528323273322-d81458248d40?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2001&q=80",
-          wastype: "Resíduo Eletrônicos, Lâmpadas",
-          address: "Guilherme Gemballa, 127",
-          cad: "Rio do Sul, SC"
-        },
-        {
-          pointName: "Colecteria",
-          picURL:
-            "https://images.unsplash.com/photo-1528323273322-d81458248d40?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2001&q=80",
-          wastype: "Resíduo Eletrônicos, Lâmpadas",
-          address: "Guilherme Gemballa, 127",
-          cad: "Rio do Sul, SC"
-        }
-      ]
+      points: []
     };
+  },
+  methods: {
+    async getInformations() {
+      await api
+        .get(`/points?state=${this.$route.query.state}`)
+        .then(e => this.points = e.data);
+    }
+  },
+  beforeMount() {
+    this.getInformations();
   },
   components: {
     Header
@@ -55,17 +49,6 @@ export default {
 </script>
 
 <style>
-#results::after {
-  content: "";
-  position: fixed;
-  background: white;
-  top: 260px;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  z-index: -1;
-}
-
 #results {
   width: 90%;
   max-width: 1100px;

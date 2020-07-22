@@ -4,4 +4,9 @@ const viacep = axios.create({
   baseURL: 'https://viacep.com.br/ws/'
 })
 
-export default viacep
+const api = axios.create({
+  baseURL: 'https://ecoleta-deno-api.glitch.me/'
+})
+
+
+export { viacep, api }
